@@ -13,7 +13,7 @@ const BuyerSchema = new mongoose.Schema({
   email: { type: String, required: true },
   companyWebsite: { type: String, required: true },
   companySize: { type: String, required: true },
-  industry: { type: String, required: true },
+  industry: { type: [String], required: true },
   additionalInfo: { type: String },
   services: { type: [ServiceSchema], required: true }
 },{
