@@ -12,8 +12,8 @@ const VendorSchema = new mongoose.Schema({
   selectedServices: { type: [String], required: true },
   additionalInfo: { type: String },
   agreeToTerms: { type: Boolean, required: true }
-},{
-    timestamps: true,
+}, {
+  timestamps: true,
 });
 
 module.exports = mongoose.model('Vendor', VendorSchema);
