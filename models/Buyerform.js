@@ -13,11 +13,11 @@ const BuyerSchema = new mongoose.Schema({
   email: { type: String, required: true },
   companyWebsite: { type: String, required: true },
   companySize: { type: String, required: true },
-  industry: { type: [String], required: true },
+  industries: { type: [String], required: true }, // Change from single industry to multiple industries
   additionalInfo: { type: String },
   services: { type: [ServiceSchema], required: true }
-},{
-    timestamps: true,
+}, {
+  timestamps: true,
 });
 
 module.exports = mongoose.model('Buyer', BuyerSchema);
