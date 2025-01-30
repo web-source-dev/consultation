@@ -10,12 +10,18 @@ const sendEmail = require('../utils/email'); // Import sendEmail function
 // Endpoint to handle Vendor form submission
 router.post('/vendor', async (req, res) => {
   try {
+    // Check if email already exists
+    const existingVendor = await Vendor.findOne({ email: req.body.email });
+    if (existingVendor) {
+      return res.status(400).send({ error: 'Email already exists' });
+    }
+
     const vendor = new Vendor(req.body);
     await vendor.save();
     
     // Send email notification
     const emailText = `Company Name: ${vendor.companyName}\nFirst Name: ${vendor.firstName}\nLast Name: ${vendor.lastName}\nEmail: ${vendor.email}\nPhone: ${vendor.phone}\nCompany Website: ${vendor.companyWebsite}\nMinimum Budget: ${vendor.minimumBudget}\nSelected Industries: ${vendor.selectedIndustries.join(', ')}\nSelected Services: ${vendor.selectedServices.join(', ')}\nAdditional Info: ${vendor.additionalInfo}`;
-    sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Form Submission', emailText);
+    await sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Form Submission', emailText);
 
     res.status(201).send({ message: 'Vendor form submitted successfully' });
   } catch (error) {
@@ -29,7 +35,7 @@ router.post('/buyer', async (req, res) => {
     
     // Send email notification
     const emailText = `Company Name: ${buyer.companyName}\nFirst Name: ${buyer.firstName}\nLast Name: ${buyer.lastName}\nEmail: ${buyer.email}\nCompany Website: ${buyer.companyWebsite}\nCompany Size: ${buyer.companySize}\nIndustry: ${buyer.industry}\nAdditional Info: ${buyer.additionalInfo}\nServices: ${buyer.services.map(service => `Service: ${service.service}, Timeframe: ${service.timeframe}, Budget: ${service.budget}`).join('\n')}`;
-    sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Form Submission', emailText);
+    await sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Form Submission', emailText);
 
     res.status(201).send({ message: 'Buyer form submitted successfully' });
   } catch (error) {
@@ -162,12 +168,12 @@ router.get('/getdata', async (req, res) => {
   }
 });
 
-router.get('/vendor/:id/matches', async (req, res) => {
-  const { id } = req.params;
+router.get('/vendor/:email/matches', async (req, res) => {
+  const { email } = req.params;
 
   try {
-    // Find the vendor by ID
-    const vendor = await Vendor.findById(id);
+    // Find the vendor by email
+    const vendor = await Vendor.findOne({ email });
 
     if (!vendor) {
       return res.status(404).send({ error: 'Vendor not found' });
@@ -213,12 +219,12 @@ router.get('/vendor/:id/matches', async (req, res) => {
     res.status(500).send({ error: 'Error processing data', details: error });
   }
 });
-router.get('/buyer/:id/matches', async (req, res) => {
-  const { id } = req.params;
+router.get('/buyer/:email/matches', async (req, res) => {
+  const { email } = req.params;
 
   try {
-    // Find the buyer by ID
-    const buyer = await Buyer.findById(id);
+    // Find the buyer by email
+    const buyer = await Buyer.findOne({ email });
 
     if (!buyer) {
       return res.status(404).send({ error: 'Buyer not found' });
@@ -264,4 +270,104 @@ router.get('/buyer/:id/matches', async (req, res) => {
     res.status(500).send({ error: 'Error processing data', details: error });
   }
 });
+
+// get all vendors 
+router.get('/getAllVendors', async function (req, res) {
+  try {
+    const vendors = await Vendor.find({});
+    const buyers = await Buyer.find({});
+    const vendorData = vendors.map((vendor) => {
+      const matchedBuyers = buyers
+        .map((buyer) => {
+          const matchReasons = [];
+
+          // Check for industry match
+          const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
+          if (industryMatch) {
+            matchReasons.push('Industry match');
+          }
+
+          // Check for service match
+          const serviceMatch = buyer.services.some((buyerService) =>
+            vendor.selectedServices.includes(buyerService.service)
+          );
+          if (serviceMatch) {
+            matchReasons.push('Service match');
+          }
+
+          if (matchReasons.length > 0) {
+            return {
+              buyerName: buyer.firstName + ' ' + buyer.lastName,
+              buyerCompany: buyer.companyName,
+              buyerId: buyer._id,
+              matchReasons,
+            };
+          }
+          return null;
+        })
+        .filter((match) => match !== null);
+
+      return {
+        ...vendor.toObject(),
+        totalBuyers: matchedBuyers.length,
+        matchedBuyers,
+      };
+    });
+
+    res.send({msg:'All Vendors Data', vendors: vendorData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error fetching vendors', details: error });
+  }
+});
+
+// get all buyers 
+router.get('/getAllBuyers', async function (req, res) {
+  try {
+    const buyers = await Buyer.find({});
+    const vendors = await Vendor.find({});
+    const buyerData = buyers.map((buyer) => {
+      const matchedVendors = vendors
+        .map((vendor) => {
+          const matchReasons = [];
+
+          // Check for industry match
+          const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
+          if (industryMatch) {
+            matchReasons.push('Industry match');
+          }
+
+          // Check for service match
+          const serviceMatch = buyer.services.some((buyerService) =>
+            vendor.selectedServices.includes(buyerService.service)
+          );
+          if (serviceMatch) {
+            matchReasons.push('Service match');
+          }
+
+          if (matchReasons.length > 0) {
+            return {
+              vendorName: vendor.companyName,
+              vendorId: vendor._id,
+              matchReasons,
+            };
+          }
+          return null;
+        })
+        .filter((match) => match !== null);
+
+      return {
+        ...buyer.toObject(),
+        totalVendors: matchedVendors.length,
+        matchedVendors,
+      };
+    });
+
+    res.send({ msg: 'All Buyers Data', buyers: buyerData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error fetching buyers', details: error });
+  }
+});
+   
 module.exports = router;
