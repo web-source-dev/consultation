@@ -65,13 +65,13 @@ router.get('/getdata', async (req, res) => {
       buyers.forEach((buyer) => {
         const matchReasons = [];
 
-        // Check for industry match
+        // Check for industryMatch
         const matchedIndustries = vendor.selectedIndustries.filter(
           (industry) => buyer.industries.includes(industry)
         );
 
         if (matchedIndustries.length > 0) {
-          // If industry matches, check for service match
+          // If industryMatches, check for serviceMatch
           const matchedServices = buyer.services
             .filter((buyerService) =>
               vendor.selectedServices.includes(buyerService.service)
@@ -80,8 +80,8 @@ router.get('/getdata', async (req, res) => {
 
           if (matchedServices.length > 0) {
             matchReasons.push(
-              `Industry match: ${matchedIndustries.join(', ')}`,
-              `Service match: ${matchedServices.join(', ')}`
+              `industryMatch: ${matchedIndustries.join(', ')}`,
+              `serviceMatch: ${matchedServices.join(', ')}`
             );
 
             matchedVendorBuyers.push({
@@ -110,13 +110,13 @@ router.get('/getdata', async (req, res) => {
       vendors.forEach((vendor) => {
         const matchReasons = [];
 
-        // Check for industry match
+        // Check for industryMatch
         const matchedIndustries = vendor.selectedIndustries.filter(
           (industry) => buyer.industries.includes(industry)
         );
 
         if (matchedIndustries.length > 0) {
-          // If industry matches, check for service match
+          // If industryMatches, check for serviceMatch
           const matchedServices = buyer.services
             .filter((buyerService) =>
               vendor.selectedServices.includes(buyerService.service)
@@ -125,8 +125,8 @@ router.get('/getdata', async (req, res) => {
 
           if (matchedServices.length > 0) {
             matchReasons.push(
-              `Industry match: ${matchedIndustries.join(', ')}`,
-              `Service match: ${matchedServices.join(', ')}`
+              `industryMatch: ${matchedIndustries.join(', ')}`,
+              `serviceMatch: ${matchedServices.join(', ')}`
             );
 
             matchedBuyerVendors.push({
@@ -188,20 +188,20 @@ router.get('/vendor/:email/matches', async (req, res) => {
     buyers.forEach((buyer) => {
       const matchReasons = [];
 
-      // Check for industry match
+      // Check for industryMatch
       const matchedIndustries = vendor.selectedIndustries.filter(
         (industry) => buyer.industries.includes(industry)
       );
       if (matchedIndustries.length > 0) {
-        // Check for service match
+        // Check for serviceMatch
         const matchedServices = buyer.services
           .filter((buyerService) =>
             vendor.selectedServices.includes(buyerService.service)
           )
           .map((matchedService) => matchedService.service);
         if (matchedServices.length > 0) {
-          matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
-          matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+          matchReasons.push(`industryMatch: ${matchedIndustries.join(', ')}`);
+          matchReasons.push(`serviceMatch: ${matchedServices.join(', ')}`);
         }
       }
 
@@ -243,20 +243,20 @@ router.get('/buyer/:email/matches', async (req, res) => {
     vendors.forEach((vendor) => {
       const matchReasons = [];
 
-      // Check for industry match
+      // Check for industryMatch
       const matchedIndustries = vendor.selectedIndustries.filter(
         (industry) => buyer.industries.includes(industry)
       );
       if (matchedIndustries.length > 0) {
-        // Check for service match
+        // Check for serviceMatch
         const matchedServices = buyer.services
           .filter((buyerService) =>
             vendor.selectedServices.includes(buyerService.service)
           )
           .map((matchedService) => matchedService.service);
         if (matchedServices.length > 0) {
-          matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
-          matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+          matchReasons.push(`industryMatch: ${matchedIndustries.join(', ')}`);
+          matchReasons.push(`serviceMatch: ${matchedServices.join(', ')}`);
         }
       }
 
@@ -290,20 +290,20 @@ router.get('/getAllVendors', async function (req, res) {
         .map((buyer) => {
           const matchReasons = [];
 
-          // Check for industry match
+          // Check for industryMatch
           const matchedIndustries = vendor.selectedIndustries.filter(
             (industry) => buyer.industries.includes(industry)
           );
           if (matchedIndustries.length > 0) {
-            // Check for service match
+            // Check for serviceMatch
             const matchedServices = buyer.services
               .filter((buyerService) =>
                 vendor.selectedServices.includes(buyerService.service)
               )
               .map((matchedService) => matchedService.service);
             if (matchedServices.length > 0) {
-              matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
-              matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+              matchReasons.push(`industryMatch: ${matchedIndustries.join(', ')}`);
+              matchReasons.push(`serviceMatch: ${matchedServices.join(', ')}`);
             }
           }
 
@@ -343,20 +343,20 @@ router.get('/getAllBuyers', async function (req, res) {
         .map((vendor) => {
           const matchReasons = [];
 
-          // Check for industry match
+          // Check for industryMatch
           const matchedIndustries = vendor.selectedIndustries.filter(
             (industry) => buyer.industries.includes(industry)
           );
           if (matchedIndustries.length > 0) {
-            // Check for service match
+            // Check for serviceMatch
             const matchedServices = buyer.services
               .filter((buyerService) =>
                 vendor.selectedServices.includes(buyerService.service)
               )
               .map((matchedService) => matchedService.service);
             if (matchedServices.length > 0) {
-              matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
-              matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+              matchReasons.push(`industryMatch: ${matchedIndustries.join(', ')}`);
+              matchReasons.push(`serviceMatch: ${matchedServices.join(', ')}`);
             }
           }
 
