@@ -28,13 +28,14 @@ router.post('/vendor', async (req, res) => {
     res.status(400).send({ error: 'Error submitting vendor form', details: error });
   }
 });
+
 router.post('/buyer', async (req, res) => {
   try {
     const buyer = new Buyer(req.body);
     await buyer.save();
     
     // Send email notification
-    const emailText = `Company Name: ${buyer.companyName}\nFirst Name: ${buyer.firstName}\nLast Name: ${buyer.lastName}\nEmail: ${buyer.email}\nCompany Website: ${buyer.companyWebsite}\nCompany Size: ${buyer.companySize}\nIndustry: ${buyer.industry}\nAdditional Info: ${buyer.additionalInfo}\nServices: ${buyer.services.map(service => `Service: ${service.service}, Timeframe: ${service.timeframe}, Budget: ${service.budget}`).join('\n')}`;
+    const emailText = `Company Name: ${buyer.companyName}\nFirst Name: ${buyer.firstName}\nLast Name: ${buyer.lastName}\nEmail: ${buyer.email}\nCompany Website: ${buyer.companyWebsite}\nCompany Size: ${buyer.companySize}\nIndustries: ${buyer.industries.join(', ')}\nAdditional Info: ${buyer.additionalInfo}\nServices: ${buyer.services.map(service => `Service: ${service.service}, Timeframe: ${service.timeframe}, Budget: ${service.budget}`).join('\n')}`;
     await sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Form Submission', emailText);
 
     res.status(201).send({ message: 'Buyer form submitted successfully' });
@@ -42,6 +43,7 @@ router.post('/buyer', async (req, res) => {
     res.status(400).send({ error: 'Error submitting buyer form', details: error });
   }
 });
+
 router.get('/getdata', async (req, res) => {
   try {
     const vendors = await Vendor.find({});
@@ -65,7 +67,7 @@ router.get('/getdata', async (req, res) => {
 
         // Check for industry match
         const matchedIndustries = vendor.selectedIndustries.filter(
-          (industry) => industry === buyer.industry
+          (industry) => buyer.industries.includes(industry)
         );
 
         if (matchedIndustries.length > 0) {
@@ -110,7 +112,7 @@ router.get('/getdata', async (req, res) => {
 
         // Check for industry match
         const matchedIndustries = vendor.selectedIndustries.filter(
-          (industry) => industry === buyer.industry
+          (industry) => buyer.industries.includes(industry)
         );
 
         if (matchedIndustries.length > 0) {
@@ -187,17 +189,20 @@ router.get('/vendor/:email/matches', async (req, res) => {
       const matchReasons = [];
 
       // Check for industry match
-      const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
-      if (industryMatch) {
-        matchReasons.push('Industry match');
-      }
-
-      // Check for service match
-      const serviceMatch = buyer.services.some((buyerService) =>
-        vendor.selectedServices.includes(buyerService.service)
+      const matchedIndustries = vendor.selectedIndustries.filter(
+        (industry) => buyer.industries.includes(industry)
       );
-      if (serviceMatch) {
-        matchReasons.push('Service match');
+      if (matchedIndustries.length > 0) {
+        // Check for service match
+        const matchedServices = buyer.services
+          .filter((buyerService) =>
+            vendor.selectedServices.includes(buyerService.service)
+          )
+          .map((matchedService) => matchedService.service);
+        if (matchedServices.length > 0) {
+          matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
+          matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+        }
       }
 
       // Add to matched buyers if there are match reasons
@@ -219,6 +224,7 @@ router.get('/vendor/:email/matches', async (req, res) => {
     res.status(500).send({ error: 'Error processing data', details: error });
   }
 });
+
 router.get('/buyer/:email/matches', async (req, res) => {
   const { email } = req.params;
 
@@ -238,17 +244,20 @@ router.get('/buyer/:email/matches', async (req, res) => {
       const matchReasons = [];
 
       // Check for industry match
-      const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
-      if (industryMatch) {
-        matchReasons.push('Industry match');
-      }
-
-      // Check for service match
-      const serviceMatch = buyer.services.some((buyerService) =>
-        vendor.selectedServices.includes(buyerService.service)
+      const matchedIndustries = vendor.selectedIndustries.filter(
+        (industry) => buyer.industries.includes(industry)
       );
-      if (serviceMatch) {
-        matchReasons.push('Service match');
+      if (matchedIndustries.length > 0) {
+        // Check for service match
+        const matchedServices = buyer.services
+          .filter((buyerService) =>
+            vendor.selectedServices.includes(buyerService.service)
+          )
+          .map((matchedService) => matchedService.service);
+        if (matchedServices.length > 0) {
+          matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
+          matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+        }
       }
 
       // Add to matched vendors if there are match reasons
@@ -282,17 +291,20 @@ router.get('/getAllVendors', async function (req, res) {
           const matchReasons = [];
 
           // Check for industry match
-          const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
-          if (industryMatch) {
-            matchReasons.push('Industry match');
-          }
-
-          // Check for service match
-          const serviceMatch = buyer.services.some((buyerService) =>
-            vendor.selectedServices.includes(buyerService.service)
+          const matchedIndustries = vendor.selectedIndustries.filter(
+            (industry) => buyer.industries.includes(industry)
           );
-          if (serviceMatch) {
-            matchReasons.push('Service match');
+          if (matchedIndustries.length > 0) {
+            // Check for service match
+            const matchedServices = buyer.services
+              .filter((buyerService) =>
+                vendor.selectedServices.includes(buyerService.service)
+              )
+              .map((matchedService) => matchedService.service);
+            if (matchedServices.length > 0) {
+              matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
+              matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+            }
           }
 
           if (matchReasons.length > 0) {
@@ -314,7 +326,7 @@ router.get('/getAllVendors', async function (req, res) {
       };
     });
 
-    res.send({msg:'All Vendors Data', vendors: vendorData });
+    res.send({ msg: 'All Vendors Data', vendors: vendorData });
   } catch (error) {
     console.error(error);
     res.status(500).send({ error: 'Error fetching vendors', details: error });
@@ -332,17 +344,20 @@ router.get('/getAllBuyers', async function (req, res) {
           const matchReasons = [];
 
           // Check for industry match
-          const industryMatch = vendor.selectedIndustries.includes(buyer.industry);
-          if (industryMatch) {
-            matchReasons.push('Industry match');
-          }
-
-          // Check for service match
-          const serviceMatch = buyer.services.some((buyerService) =>
-            vendor.selectedServices.includes(buyerService.service)
+          const matchedIndustries = vendor.selectedIndustries.filter(
+            (industry) => buyer.industries.includes(industry)
           );
-          if (serviceMatch) {
-            matchReasons.push('Service match');
+          if (matchedIndustries.length > 0) {
+            // Check for service match
+            const matchedServices = buyer.services
+              .filter((buyerService) =>
+                vendor.selectedServices.includes(buyerService.service)
+              )
+              .map((matchedService) => matchedService.service);
+            if (matchedServices.length > 0) {
+              matchReasons.push(`Industry match: ${matchedIndustries.join(', ')}`);
+              matchReasons.push(`Service match: ${matchedServices.join(', ')}`);
+            }
           }
 
           if (matchReasons.length > 0) {
