@@ -309,9 +309,7 @@ router.get('/getAllVendors', async function (req, res) {
 
           if (matchReasons.length > 0) {
             return {
-              buyerName: buyer.firstName + ' ' + buyer.lastName,
-              buyerCompany: buyer.companyName,
-              buyerId: buyer._id,
+              buyer,
               matchReasons,
             };
           }
@@ -362,8 +360,7 @@ router.get('/getAllBuyers', async function (req, res) {
 
           if (matchReasons.length > 0) {
             return {
-              vendorName: vendor.companyName,
-              vendorId: vendor._id,
+              vendor,
               matchReasons,
             };
           }
