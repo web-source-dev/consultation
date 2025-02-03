@@ -32,7 +32,6 @@ router.post('/consultation/form/:apikey', async (req, res) => {
     apikey: platform.value
     });
     await newConsultation.save();
-    res.status(201).json({ message: 'Consultation form submitted successfully!' });
     console.log('Consultation form submitted successfully:', newConsultation);
 
     const transporter = nodemailer.createTransport({
@@ -71,6 +70,7 @@ router.post('/consultation/form/:apikey', async (req, res) => {
         return res.status(500).json({ message: 'Error sending email.' });
       } else {
         console.log('Email sent:', info.response);
+        return res.status(201).json({ message: 'Consultation form submitted and email sent successfully!', newConsultation });
       }
     });
     } catch (error) {
