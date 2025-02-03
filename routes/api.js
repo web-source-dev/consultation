@@ -38,15 +38,32 @@ router.post('/consultation/form/:apikey', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Use environment variables for sensitive information
+        user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'muhammadtayyab2928@gmail.com',
+      to: ['muhammadtayyab2928@gmail.com', `${email}`], // Send to two users
       subject: 'New Consultation Form Submission',
-      text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}\nDate: ${date}\nTime: ${time}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+          <header style="background-color: #4CAF50; padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">
+            <h1 style="color: #fff;">Consultation Booking Confirmation</h1>
+          </header>
+          <main style="padding: 20px; border-radius: 10px;">
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Message:</strong> ${message}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Time:</strong> ${time}</p>
+          </main>
+          <footer style="background-color: #f7f7f7; padding: 10px; text-align: center; border-top: 1px solid #ddd;">
+            <p style="font-size: 0.9em; color: #777;">Thank you for booking a consultation with us. We will get back to you shortly.</p>
+            <p style="font-size: 0.9em; color: #777;">This is an automated message. Please do not reply.</p>
+          </footer>
+        </div>
+      `, // Professional email design with header, footer, and content box
     };
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
