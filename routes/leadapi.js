@@ -13,19 +13,37 @@ router.post('/vendor', async (req, res) => {
     // Check if email already exists
     const existingVendor = await Vendor.findOne({ email: req.body.email });
     if (existingVendor) {
-      return res.status(400).send({ error: 'Email already exists' });
+      return res.status(400).send({ message: 'Email already exists' });
     }
 
     const vendor = new Vendor(req.body);
     await vendor.save();
     
-    // Send email notification
-    const emailText = `Company Name: ${vendor.companyName}\nFirst Name: ${vendor.firstName}\nLast Name: ${vendor.lastName}\nEmail: ${vendor.email}\nPhone: ${vendor.phone}\nCompany Website: ${vendor.companyWebsite}\nMinimum Budget: ${vendor.minimumBudget}\nSelected Industries: ${vendor.selectedIndustries.join(', ')}\nSelected Services: ${vendor.selectedServices.join(', ')}\nAdditional Info: ${vendor.additionalInfo}`;
-    await sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Form Submission', emailText);
+    // **Admin Email Content**
+    const adminEmailText = `New Vendor Registration:\n\nCompany Name: ${vendor.companyName}\nFirst Name: ${vendor.firstName}\nLast Name: ${vendor.lastName}\nEmail: ${vendor.email}\nPhone: ${vendor.phone}\nCompany Website: ${vendor.companyWebsite}\nMinimum Budget: ${vendor.minimumBudget}\nSelected Industries: ${vendor.selectedIndustries.join(', ')}\nSelected Services: ${vendor.selectedServices.join(', ')}\nAdditional Info: ${vendor.additionalInfo}`;
 
-    res.status(201).send({ message: 'Vendor form submitted successfully' });
+    // Send admin email
+    await sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Registration - Admin Notification', adminEmailText);
+    
+    // Send vendor confirmation email
+    const vendorEmailText = `
+      Dear ${vendor.firstName},
+      
+      Thank you for registering as a vendor on our platform. Our team will review your details and get back to you soon.
+      
+      If you have any questions, feel free to contact us.
+      
+      Best Regards,
+      Reachly.
+      
+      Login to Your Account: https://www.reachly.ca/vendor-dashboard-2
+    `;
+
+    await sendEmail(vendor.email.trim(), 'Thank You for Registering as a Vendor', vendorEmailText);
+
+    res.status(201).send({ message: 'Request submitted successfully' });
   } catch (error) {
-    res.status(400).send({ error: 'Error submitting vendor form', details: error });
+    res.status(400).send({ error: 'Error submitting vendor form', details: error.message });
   }
 });
 
@@ -34,16 +52,33 @@ router.post('/buyer', async (req, res) => {
     const buyer = new Buyer(req.body);
     await buyer.save();
     
-    // Send email notification
-    const emailText = `Company Name: ${buyer.companyName}\nFirst Name: ${buyer.firstName}\nLast Name: ${buyer.lastName}\nEmail: ${buyer.email}\nCompany Website: ${buyer.companyWebsite}\nCompany Size: ${buyer.companySize}\nIndustries: ${buyer.industries.join(', ')}\nAdditional Info: ${buyer.additionalInfo}\nServices: ${buyer.services.map(service => `Service: ${service.service}, Timeframe: ${service.timeframe}, Budget: ${service.budget}`).join('\n')}`;
-    await sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Form Submission', emailText);
-
+    // **Admin Email Content**
+    const adminEmailText = `New Buyer Registration:\n\nCompany Name: ${buyer.companyName}\nFirst Name: ${buyer.firstName}\nLast Name: ${buyer.lastName}\nEmail: ${buyer.email}\nCompany Website: ${buyer.companyWebsite}\nCompany Size: ${buyer.companySize}\nIndustries: ${buyer.industries.join(', ')}\nAdditional Info: ${buyer.additionalInfo}\nServices:\n${buyer.services.map(service => `Service: ${service.service}, Timeframe: ${service.timeframe}, Budget: ${service.budget}`).join('\n')}`;
+    
+    // Send admin email
+    await sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Registration - Admin Notification', adminEmailText);
+    
+    // Send buyer confirmation email
+    const buyerEmailText = `
+      Dear ${buyer.firstName},
+      
+      Thank you for submitting your request on our platform. Our team will review your details and connect you with the best vendors for your needs.
+      
+      If you have any questions, feel free to contact us.
+      
+      Best Regards,
+      Reachly.
+      
+      Login to Your Account: https://www.reachly.ca/vendor-dashboard-2
+    `;
+    
+    await sendEmail(buyer.email, 'Thank You for Registering as a Buyer', buyerEmailText);
+    
     res.status(201).send({ message: 'Buyer form submitted successfully' });
   } catch (error) {
-    res.status(400).send({ error: 'Error submitting buyer form', details: error });
+    res.status(400).send({ error: 'Error submitting buyer form', details: error.message });
   }
 });
-
 router.get('/getdata', async (req, res) => {
   try {
     const vendors = await Vendor.find({});
