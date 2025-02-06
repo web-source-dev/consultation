@@ -17,13 +17,16 @@ const sendEmail = (to, subject, text) => {
     text,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);  // Reject the promise on error
+      } else {
+        resolve(info);  // Resolve the promise with the info object on success
+      }
+    });
   });
 };
 
 module.exports = sendEmail;
+
