@@ -24,25 +24,27 @@ router.post('/vendor', async (req, res) => {
 
     // Send admin email
     await sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Registration - Admin Notification', adminEmailText);
-    
+
     // Send vendor confirmation email
     const vendorEmailText = `
       Dear ${vendor.firstName},
-      
+
       Thank you for registering as a vendor on our platform. Our team will review your details and get back to you soon.
-      
+
       If you have any questions, feel free to contact us.
-      
+
       Best Regards,
       Reachly.
-      
+
       Login to Your Account: https://www.reachly.ca/vendor-dashboard-2
     `;
 
     await sendEmail(vendor.email.trim(), 'Thank You for Registering as a Vendor', vendorEmailText);
 
+    // Respond to the client only after emails are sent
     res.status(201).send({ message: 'Request submitted successfully' });
   } catch (error) {
+    // If there’s any error, respond with error message
     res.status(400).send({ error: 'Error submitting vendor form', details: error.message });
   }
 });
@@ -74,11 +76,14 @@ router.post('/buyer', async (req, res) => {
     
     await sendEmail(buyer.email, 'Thank You for Registering as a Buyer', buyerEmailText);
     
+    // Respond to the client only after emails are sent
     res.status(201).send({ message: 'Buyer form submitted successfully' });
   } catch (error) {
+    // Handle any errors and send a detailed response
     res.status(400).send({ error: 'Error submitting buyer form', details: error.message });
   }
 });
+
 router.get('/getdata', async (req, res) => {
   try {
     const vendors = await Vendor.find({});
