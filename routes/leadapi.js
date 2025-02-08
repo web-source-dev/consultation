@@ -20,27 +20,24 @@ router.post('/vendor', async (req, res) => {
     await vendor.save();
     // Send vendor welcome email
     const vendorEmailText = `
-      Subject: Welcome to Reachly – Set Up Your Vendor Dashboard
-
-      Dear ${vendor.firstName, vendor.lastName},
-
-      Thank you for signing up with Reachly! We’re thrilled you’ve chosen us to help grow your business through high-quality, ready-to-buy leads. Your decision to work with us means you’re on the right path to predictable, scalable revenue.
-
-      To get started, please set up your password and access your Vendor Dashboard, where you can:
-
-      ✔ View your matched leads and their details
-      ✔ Track your engagement history and responses
-      ✔ Manage your preferences and account settings
-
-      Click below to create your password and log in:
-
-      <a href="https://www.reachly.ca/vendor-dashboard-2">Set Up My Vendor Dashboard</a>
-
-      We look forward to helping you connect with qualified buyers and drive more revenue. If you have any questions, our team is always here to help at support@reachly.ca.
-
-      Welcome aboard!
-
-      The Reachly Team
+      <html>
+        <body>
+          <h2>Welcome to Reachly – Set Up Your Vendor Dashboard</h2>
+          <p>Dear ${vendor.firstName} ${vendor.lastName},</p>
+          <p>Thank you for signing up with Reachly! We’re thrilled you’ve chosen us to help grow your business through high-quality, ready-to-buy leads. Your decision to work with us means you’re on the right path to predictable, scalable revenue.</p>
+          <p>To get started, please set up your password and access your Vendor Dashboard, where you can:</p>
+          <ul>
+            <li>View your matched leads and their details</li>
+            <li>Track your engagement history and responses</li>
+            <li>Manage your preferences and account settings</li>
+          </ul>
+          <p>Click below to create your password and log in:</p>
+          <p><a href="https://www.reachly.ca/vendor-dashboard-2">Set Up My Vendor Dashboard</a></p>
+          <p>We look forward to helping you connect with qualified buyers and drive more revenue. If you have any questions, our team is always here to help at <a href="mailto:support@reachly.ca">support@reachly.ca</a>.</p>
+          <p>Welcome aboard!</p>
+          <p>The Reachly Team</p>
+        </body>
+      </html>
     `;
 
     await sendEmail(vendor.email.trim(), 'Welcome to Reachly – Set Up Your Vendor Dashboard', vendorEmailText);
@@ -60,27 +57,24 @@ router.post('/buyer', async (req, res) => {
     await buyer.save();
     
     const buyerEmailText = `
-      Subject: Welcome to Reachly! Connect with Top SaaS Vendors
-
-      Dear ${buyer.firstName},
-
-      Thank you for signing up with Reachly! We’re excited to connect you with top SaaS vendors who can help elevate your business. By choosing Reachly, you gain direct access to pre-vetted solutions that align with your needs.
-
-      To get started, create your password and log in to your Buyer Dashboard, where you can:
-
-      ✔ View the vendors you’ve been matched with
-      ✔ Access their contact details and proposals
-      ✔ Track and manage your inquiries seamlessly
-
-      Click below to create your password and access your dashboard:
-
-      <a href="https://www.reachly.ca/buyer-dashboard">Set Up My Buyer Dashboard</a>
-
-      We’re here to make your SaaS vendor selection process easier, faster, and more effective. If you have any questions, feel free to reach out at support@reachly.ca.
-
-      We can’t wait to help you find the perfect solution!
-
-      The Reachly Team
+      <html>
+        <body>
+          <h2>Welcome to Reachly! Connect with Top SaaS Vendors</h2>
+          <p>Dear ${buyer.firstName} ${buyer.lastName},</p>
+          <p>Thank you for signing up with Reachly! We’re excited to connect you with top SaaS vendors who can help elevate your business. By choosing Reachly, you gain direct access to pre-vetted solutions that align with your needs.</p>
+          <p>To get started, create your password and log in to your Buyer Dashboard, where you can:</p>
+          <ul>
+            <li>View the vendors you’ve been matched with</li>
+            <li>Access their contact details and proposals</li>
+            <li>Track and manage your inquiries seamlessly</li>
+          </ul>
+          <p>Click below to create your password and access your dashboard:</p>
+          <p><a href="https://www.reachly.ca/buyer-dashboard">Set Up My Buyer Dashboard</a></p>
+          <p>We’re here to make your SaaS vendor selection process easier, faster, and more effective. If you have any questions, feel free to reach out at <a href="mailto:support@reachly.ca">support@reachly.ca</a>.</p>
+          <p>We can’t wait to help you find the perfect solution!</p>
+          <p>The Reachly Team</p>
+        </body>
+      </html>
     `;
     await sendEmail('muhammadtayyab2928@gmail.com', 'New Buyer Registration - Admin Notification', buyerEmailText);
     
@@ -93,6 +87,7 @@ router.post('/buyer', async (req, res) => {
     res.status(400).send({ error: 'Error submitting buyer form', details: error.message });
   }
 });
+
 
 router.get('/getdata', async (req, res) => {
   try {
