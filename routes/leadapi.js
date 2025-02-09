@@ -10,10 +10,16 @@ const sendEmail = require('../utils/email'); // Import sendEmail function
 // Endpoint to handle Vendor form submission
 router.post('/vendor', async (req, res) => {
   try {
-    // Check if email already exists
+    // Check if email already exists in Vendor collection
     const existingVendor = await Vendor.findOne({ email: req.body.email });
     if (existingVendor) {
-      return res.status(400).send({ message: 'Email already exists' });
+      return res.status(400).send({ message: 'This email is already registered as a vendor.' });
+    }
+
+    // Check if email already exists in Buyer collection
+    const existingBuyer = await Buyer.findOne({ email: req.body.email });
+    if (existingBuyer) {
+      return res.status(400).send({ message: 'This email is already registered as a buyer.' });
     }
 
     const vendor = new Vendor(req.body);
@@ -44,7 +50,7 @@ router.post('/vendor', async (req, res) => {
     await sendEmail('muhammadtayyab2928@gmail.com', 'New Vendor Registration - Admin Notification', vendorEmailText);
 
     // Respond to the client only after emails are sent
-    res.status(201).send({ message: 'Request submitted successfully' });
+    res.status(201).send({ message: 'Request submitted. Please check your email for further instructions.' });
   } catch (error) {
     // If there’s any error, respond with error message
     res.status(400).send({ error: 'Error submitting vendor form', details: error.message });
@@ -53,6 +59,18 @@ router.post('/vendor', async (req, res) => {
 
 router.post('/buyer', async (req, res) => {
   try {
+    // Check if email already exists in Buyer collection
+    const existingBuyer = await Buyer.findOne({ email: req.body.email });
+    if (existingBuyer) {
+      return res.status(400).send({ message: 'This email is already registered as a buyer.' });
+    }
+
+    // Check if email already exists in Vendor collection
+    const existingVendor = await Vendor.findOne({ email: req.body.email });
+    if (existingVendor) {
+      return res.status(400).send({ message: 'This email is already registered as a vendor.' });
+    }
+
     const buyer = new Buyer(req.body);
     await buyer.save();
     
@@ -60,7 +78,7 @@ router.post('/buyer', async (req, res) => {
       <html>
         <body>
           <h2>Welcome to Reachly! Connect with Top SaaS Vendors</h2>
-          <p>Dear ${buyer.firstName} ${buyer.lastName},</p>
+          <p>Dear ${buyer.firstName},</p>
           <p>Thank you for signing up with Reachly! We’re excited to connect you with top SaaS vendors who can help elevate your business. By choosing Reachly, you gain direct access to pre-vetted solutions that align with your needs.</p>
           <p>To get started, create your password and log in to your Buyer Dashboard, where you can:</p>
           <ul>
@@ -81,7 +99,7 @@ router.post('/buyer', async (req, res) => {
     await sendEmail(buyer.email, 'Welcome to Reachly! Connect with Top SaaS Vendors', buyerEmailText);
     
     // Respond to the client only after emails are sent
-    res.status(201).send({ message: 'Buyer form submitted successfully' });
+    res.status(201).send({ message: 'Request submitted. Please check your email for further instructions' });
   } catch (error) {
     // Handle any errors and send a detailed response
     res.status(400).send({ error: 'Error submitting buyer form', details: error.message });
