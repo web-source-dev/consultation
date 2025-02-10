@@ -1,27 +1,31 @@
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 require('dotenv').config(); // Use dotenv to manage environment variables
 
-const sendEmail = async (to, subject, html) => {
-  const data = {
-    sender: { email: process.env.SENDINBLUE_SENDER_EMAIL },
-    to: [{ email: to }],
-    subject: subject,
-    htmlContent: html,
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // Use environment variables for sensitive information
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const sendEmail = (to, subject, html) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    html, // Use html instead of text
   };
 
-  try {
-    const response = await axios.post('https://api.sendinblue.com/v3/smtp/email', data, {
-      headers: {
-        'api-key': process.env.SENDINBLUE_API_KEY,
-        'Content-Type': 'application/json',
-      },
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);  // Reject the promise on error
+      } else {
+        resolve(info);  // Resolve the promise with the info object on success
+      }
     });
-    console.log('response',response);
-
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response.data.message);
-  }
+  });
 };
 
 module.exports = sendEmail;
